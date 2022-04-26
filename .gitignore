@@ -1,0 +1,9 @@
+.vscode/
+.idea/
+.build/
+*.DS_Store
+*.txt
+*.a
+*.o
+*.so
+*.dylib
