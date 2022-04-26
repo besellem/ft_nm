@@ -6,100 +6,71 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:40:44 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 15:45:06 by besellem         ###   ########.fr       */
+/*   Updated: 2022/04/26 21:31:03 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-// int		find_bin_type(const t_file *file)
-// {
-	
-// }
+t_parsing_opts		g_opts;
 
-void	close_file(t_file *file)
-{
-	if (file->p)
-	{
-		if (SYSCALL_ERR == munmap(file->p, file->st.st_size))
-			ft_dprintf(2, "munmap error: %s\n", strerror(errno));
-	}
-	if (file->fd)
-		close(file->fd);
-}
-
-int		open_file(const char *prog_name, const char *filename, t_file *file)
-{
-	file->fd = open(filename, O_RDONLY);
-	if (SYSCALL_ERR == file->fd)
-	{
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
-		return (1);
-	}
-
-	if (SYSCALL_ERR == fstat(file->fd, &file->st))
-	{
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
-		return (1);
-	}
-
-	file->p = mmap(NULL, file->st.st_size, PROT_READ, MAP_PRIVATE, file->fd, 0);
-	if (MAP_FAILED == file->p)
-	{
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
-		return (1);
-	}
-
-	return (0);
-}
-
-void	exec_on_file(const char *prog_name, const char *filename)
+int		nm(const char *prog_name, const char *filename, bool print_header)
 {
 	t_file	file = {0};
 
-	if (open_file(prog_name, filename, &file))
-		return ;
-
-	if (file.st.st_size < (int)sizeof(struct mach_header))
+	if (init_file(prog_name, filename, &file))
+		return 1;
+	
+	if (find_elf_class(&file))
 	{
-		ft_printf("%s: %s: File too small to be valid\n", prog_name, filename);
-		return ;
+		ft_printf("%s: %s: file format not recognized\n", prog_name, filename);
+		return 1;
 	}
-	// if (find_bin_type(&file))
-	// {
-	// 	ft_printf("%s: %s: File type not supported\n", prog_name, filename);
-	// 	return ;
-	// }
 
-	// write(1, file.p, file.st.st_size);
 
-	close_file(&file);
+	// ft_printf("class: %d\n", file.class == ELFCLASS32 ? 32 : 64);
+	
+	// if (ELFCLASS32 == file.class)
+	// 	elf32_exec(&file, print_header);
+	// else if (ELFCLASS64 == file.class)
+	// 	elf64_exec(&file, print_header);
+	if (ELFCLASS64 == file.class)
+		elf64_exec(&file, print_header);
+
+	destroy_file(&file);
+	return 0;
 }
 
 int		main(int ac, char **av)
 {
-	const char		*prog_name = ft_basename(av[0]);
-	t_parsing_opts	opts;
+	const char			*prog_name = ft_basename(av[0]);
+	bool				errors = false;
 
-	opts = parse_args(ac, av, true, "agurp");
-	if (option_set(opts.opts, OPT_ILLEGAL))
+
+	/* parse arguments */
+	g_opts = parse_args(ac, av, true, "aguorp");
+
+	/* if there's an illegal option found, quit properly */
+	if (option_set(g_opts.opts, OPT_ILLEGAL))
 	{
 		ft_dprintf(STDERR_FILENO, "%s: illegal option -- %c\n",
-				   prog_name, find_option_symbol(opts.opts & ~OPT_ILLEGAL));
-		return (1);
+				   prog_name, find_option_symbol(g_opts.opts & ~OPT_ILLEGAL));
+		return 1;
 	}
 
 
-	if (opts.end_pos == ac)
+	/* if there's no file provided, try nm on ./a.out */
+	if (g_opts.end_pos == ac)
 	{
-		exec_on_file(prog_name, FILE_BY_DEFAULT);
-		return (0);
+		errors |= nm(prog_name, "a.out", false);
 	}
-
-	for (int i = opts.end_pos; i < ac; ++i)
+	else
 	{
-		exec_on_file(prog_name, av[i]);
+		for (int i = g_opts.end_pos; i < ac; ++i)
+		{
+			errors |= nm(prog_name, av[i], (ac > 2));
+		}
 	}
 	
-	return (0);
+	return errors;
 }

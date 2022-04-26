@@ -6,14 +6,14 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/26 14:48:05 by besellem          #+#    #+#              #
-#    Updated: 2022/04/26 14:49:08 by besellem         ###   ########.fr        #
+#    Updated: 2022/04/26 21:34:19 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # COMPILATION
 
-CC			:= clang
-CFLAGS 		:= -Wall -Wextra -Werror #-g3 -fsanitize=address #-Wpedantic -O2
+CC			:= gcc
+CFLAGS 		:= -Wall -Wextra -Werror -g3 -fsanitize=address #-Wpedantic -O2
 INCS		:= ./incs/ft_nm.h
 IFLAGS 		:= -I./incs -I./libft/incs
 LIBFLAGS 	:= -L./libft -lft
@@ -23,9 +23,8 @@ LIBFLAGS 	:= -L./libft -lft
 BUILD		:= .build
 LIB_DIR		:= libft
 SRC_DIR		:= srcs
-SUB_DIR		:= #display \
-			#    parser \
-			#    utils
+SUB_DIR		:= elf_utils \
+			   elf64
 OBJ_DIR 	:= $(BUILD)/obj
 DIRS		:= $(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_DIR))
 
@@ -33,27 +32,11 @@ DIRS		:= $(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_DIR))
 
 NAME	:= ft_nm
 SRC		:= main.c
-# SUB_SRC	:= print_blocks.c \
-# 		   print_color.c \
-# 		   print_entries.c \
-# 		   print_group.c \
-# 		   print_inode.c \
-# 		   print_nlinks.c \
-# 		   print_owner.c \
-# 		   print_permissions.c \
-# 		   print_readlink.c \
-# 		   print_size.c \
-# 		   print_time.c \
-# 		   print_xattrs.c
-# SRC		+= $(addprefix display/, $(SUB_SRC))
-# SUB_SRC	:= parse_args.c
-# SRC		+= $(addprefix parser/, $(SUB_SRC))
-# SUB_SRC	:= flag_utils.c \
-# 		   general.c \
-# 		   memory_management.c \
-# 		   sort_utils.c \
-# 		   utils.c
-# SRC		+= $(addprefix utils/, $(SUB_SRC))
+SUB_SRC	:= utils.c \
+		   sorting.c
+SRC		+= $(addprefix elf_utils/, $(SUB_SRC))
+SUB_SRC	:= elf64_exec.c
+SRC		+= $(addprefix elf64/, $(SUB_SRC))
 
 
 OBJ 	:= $(SRC:%.c=$(OBJ_DIR)/%.o)
