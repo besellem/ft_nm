@@ -6,12 +6,18 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:38:46 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:37:47 by besellem         ###   ########.fr       */
+/*   Updated: 2022/04/26 21:46:29 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef FT_NM_H
 # define FT_NM_H
+
+
+#ifndef __linux__
+# error "This program is only for Linux"
+#endif
+
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -35,10 +41,6 @@ extern t_parsing_opts	g_opts;
 /*
 ** -- DEFINES --
 */
-
-#ifndef __linux__
-# error "This program is only for Linux"
-#endif
 
 #if 1
 # define DEBUG
