@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 21:29:05 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:40:13 by besellem         ###   ########.fr       */
+/*   Updated: 2022/04/27 16:19:01 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,10 @@ int		sort_alpha_asc(t_symbol a, t_symbol b)
 
 	free(s1);
 	free(s2);
+
+	// if (0 == res)
+	// 	return ft_strcmp(a.name, b.name);
+
 	return res;
 }
 
@@ -42,6 +46,11 @@ int		sort_alpha_desc(t_symbol a, t_symbol b)
 
 int		sort_addr_asc(t_symbol a, t_symbol b)
 {
+	if (a.offset == 0 && b.offset == 0)
+	{
+		LOG
+		return sort_alpha_asc(a, b);
+	}
 	return (int)(a.offset - b.offset);
 }
 

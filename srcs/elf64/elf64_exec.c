@@ -6,30 +6,48 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:33:48 by besellem         ###   ########.fr       */
+/*   Updated: 2022/04/27 16:08:45 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-static char		elf64_get_sym_type(const Elf64_Sym *sym)
+static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 {
-	switch (sym->st_info)
-	{
-		case STT_FILE: return 'a';
+	const Elf64_Word	_type = shdr[sym.st_shndx].sh_type;
+	const Elf64_Xword	_flags = shdr[sym.st_shndx].sh_flags;
+	const unsigned char	_info = sym.st_info;
+	char				type;
 
-		default:
-			break;
-	}
-
-	switch (ELF64_ST_BIND(sym->st_info))
-	{
-		case STB_GLOBAL: return 'G';
-		case STB_LOCAL:  return 'L';
-		case STB_WEAK:   return 'W';
-		
-		default:         return '?';
-	}
+	if (ELF64_ST_BIND(_info) == STB_GNU_UNIQUE)
+		type = 'u';
+	else if (ELF64_ST_BIND(_info) == STB_WEAK)
+		type = sym.st_shndx == SHN_UNDEF ? 'w' : 'W';
+	else if (ELF64_ST_BIND(_info) == STB_WEAK && ELF64_ST_TYPE(_info) == STT_OBJECT)
+		type = sym.st_shndx == SHN_UNDEF ? 'v' : 'V';
+	else if (sym.st_shndx == SHN_UNDEF)
+		type = 'U';
+	else if (sym.st_shndx == SHN_ABS)
+		type = 'A';
+	else if (sym.st_shndx == SHN_COMMON)
+		type = 'C';
+	else if (_type == SHT_NOBITS && _flags == (SHF_ALLOC | SHF_WRITE))
+		type = 'B';
+	else if (_type == SHT_PROGBITS && (_flags == SHF_ALLOC || _flags == (SHF_ALLOC | SHF_MERGE)))
+		type = 'R';
+	else if ((_type == SHT_PROGBITS && _flags == (SHF_ALLOC | SHF_WRITE)) ||
+			 _type == SHT_DYNAMIC ||
+			 (ELF64_ST_BIND(_info) == STB_GLOBAL && _type == STT_OBJECT && sym.st_shndx == SHN_UNDEF))
+		type = 'D';
+	else if (_type == SHT_PROGBITS || _type == SHT_INIT_ARRAY || _type == SHT_FINI_ARRAY)
+		type = 'T';
+	else
+		type = '?';
+	
+	if (ELF64_ST_BIND(_info) == STB_LOCAL && type != '?')
+		type += 32;
+	
+	return type;
 }
 
 static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
@@ -42,7 +60,7 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 		char		*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 		t_symbol	sym = {0};
 
-		sym.type = elf64_get_sym_type(&symtab[i]);
+		sym.type = elf64_get_sym_type(shdr, symtab[i]);
 		sym.name = strtab + symtab[i].st_name;
 		sym.offset = symtab[i].st_value;
 		
@@ -93,7 +111,7 @@ void	elf64_exec(const t_file *file, bool print_header)
 	// print_Ehdr(hdr);
 	// print_Phdr(phdr);
 
-	for (int i = 0; i < hdr->e_shnum; ++i)
+	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
