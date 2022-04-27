@@ -7,3 +7,4 @@
 *.o
 *.so
 *.dylib
+ft_nm

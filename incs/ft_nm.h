@@ -35,6 +35,7 @@
 ** -- GLOBALS --
 */
 
+extern char				*g_prog_name;
 extern t_parsing_opts	g_opts;
 
 
@@ -58,8 +59,9 @@ extern t_parsing_opts	g_opts;
 
 
 #define get_sorting_cmp() \
-	&sort_alpha_asc
-	// option_set(g_opts.opts, OPT_A_MIN)
+	(option_set(g_opts.opts, OPT_R_MIN) ? \
+		(option_set(g_opts.opts, OPT_N_MIN) ? &sort_addr_desc : &sort_alpha_desc) : \
+		(option_set(g_opts.opts, OPT_N_MIN) ? &sort_addr_asc : &sort_alpha_asc))
 	
 
 
@@ -91,13 +93,15 @@ typedef struct
 */
 
 /* utils */
-int		init_file(const char *, const char *, t_file *);
+int		init_file(const char *, t_file *);
 void	destroy_file(t_file *);
 int		find_elf_class(t_file *);
 
 /* utils - sorting */
 int		sort_alpha_asc(t_symbol, t_symbol);
 int		sort_alpha_desc(t_symbol, t_symbol);
+int		sort_addr_asc(t_symbol, t_symbol);
+int		sort_addr_desc(t_symbol, t_symbol);
 
 
 // TODO: to remove

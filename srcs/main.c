@@ -12,21 +12,21 @@
 
 #include "ft_nm.h"
 
+char				*g_prog_name;
 t_parsing_opts		g_opts;
 
-int		nm(const char *prog_name, const char *filename, bool print_header)
+int		ft_nm(const char *filename, bool print_header)
 {
 	t_file	file = {0};
 
-	if (init_file(prog_name, filename, &file))
+	if (init_file(filename, &file))
 		return 1;
 	
 	if (find_elf_class(&file))
 	{
-		ft_printf("%s: %s: file format not recognized\n", prog_name, filename);
+		ft_printf("%s: %s: file format not recognized\n", g_prog_name, filename);
 		return 1;
 	}
-
 
 	// ft_printf("class: %d\n", file.class == ELFCLASS32 ? 32 : 64);
 	
@@ -43,32 +43,32 @@ int		nm(const char *prog_name, const char *filename, bool print_header)
 
 int		main(int ac, char **av)
 {
-	const char			*prog_name = ft_basename(av[0]);
-	bool				errors = false;
+	bool	errors = false;
 
+	g_prog_name = ft_basename(av[0]);
 
 	/* parse arguments */
-	g_opts = parse_args(ac, av, true, "aguorp");
+	g_opts = parse_args(ac, av, true, "agunorp");
 
 	/* if there's an illegal option found, quit properly */
 	if (option_set(g_opts.opts, OPT_ILLEGAL))
 	{
 		ft_dprintf(STDERR_FILENO, "%s: illegal option -- %c\n",
-				   prog_name, find_option_symbol(g_opts.opts & ~OPT_ILLEGAL));
+				   g_prog_name, find_option_symbol(g_opts.opts & ~OPT_ILLEGAL));
 		return 1;
 	}
 
 
-	/* if there's no file provided, try nm on ./a.out */
+	/* if there's no file provided, try ft_nm on ./a.out */
 	if (g_opts.end_pos == ac)
 	{
-		errors |= nm(prog_name, "a.out", false);
+		errors |= ft_nm("a.out", false);
 	}
 	else
 	{
 		for (int i = g_opts.end_pos; i < ac; ++i)
 		{
-			errors |= nm(prog_name, av[i], (ac > 2));
+			errors |= ft_nm(av[i], (ac - g_opts.end_pos > 1));
 		}
 	}
 	

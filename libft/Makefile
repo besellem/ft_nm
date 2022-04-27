@@ -207,7 +207,7 @@ OBJS 		:=	$(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 ## Commands
 CC			:=	gcc
-CFLAGS		:=	-Wall -Wextra -std=c99 -O2
+CFLAGS		:=	-Wall -Wextra -Werror -std=c99
 LIBC		:=	ar rcs
 RM			:=	rm -f
 

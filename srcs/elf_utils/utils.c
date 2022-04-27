@@ -6,42 +6,45 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:59 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:31:33 by besellem         ###   ########.fr       */
+/*   Updated: 2022/04/27 15:15:35 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-int		init_file(const char *prog_name, const char *filename, t_file *file)
+int		init_file(const char *filename, t_file *file)
 {
+	errno = 0;
+
 	file->filename = (char *)filename;
 	file->fd = open(filename, O_RDONLY);
 	if (SYSCALL_ERR == file->fd)
 	{
 		LOG
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
+		ft_dprintf(STDERR_FILENO, "%s: '%s': %s\n",
+			g_prog_name, filename, strerror(errno));
 		return 1;
 	}
 
 	if (SYSCALL_ERR == fstat(file->fd, &file->st))
+		return 1;
+
+	if (S_ISDIR(file->st.st_mode))
 	{
 		LOG
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
+		ft_dprintf(STDERR_FILENO, "%s: Warning: '%s' is a directory\n", g_prog_name, filename);
 		return 1;
 	}
 
+	// file too small to be valid
 	if (file->st.st_size < (long)sizeof(Elf32_Ehdr))
-	{
-		LOG
-		ft_printf("%s: %s: file too small to be valid\n", prog_name, filename);
 		return 1;
-	}
 
 	file->p = mmap(NULL, file->st.st_size, PROT_READ, MAP_SHARED, file->fd, 0);
 	if (MAP_FAILED == file->p)
 	{
 		LOG
-		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", prog_name, filename, strerror(errno));
+		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", g_prog_name, filename, strerror(errno));
 		return 1;
 	}
 
@@ -53,7 +56,7 @@ void	destroy_file(t_file *file)
 	if (file->p)
 	{
 		if (SYSCALL_ERR == munmap(file->p, file->st.st_size))
-			ft_dprintf(2, "munmap error: %s\n", strerror(errno));
+			ft_dprintf(STDERR_FILENO, "munmap error: %s\n", strerror(errno));
 	}
 	if (file->fd)
 		close(file->fd);
