@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/19 13:42:44 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 14:59:48 by besellem         ###   ########.fr       */
+/*   Updated: 2021/11/07 14:52:21 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ typedef uint64_t				t_uint64;
 
 /*
 ** __int128_t is a 16 bytes type, wider than an `unsigned long long' (8 bytes),
-** it is defined by gcc or gcc on certain versions.
+** it is defined by gcc or clang on certain versions.
 */
 # if defined(__SIZEOF_INT128__)
 

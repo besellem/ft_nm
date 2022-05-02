@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/07 22:48:02 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:38:04 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/02 18:37:28 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,14 +43,12 @@
 **   @return: nothing
 */
 #define lst_push_front(__head, __val) {                                        \
-	if (1) {                                                              \
 		typeof(**__head) *__x = ft_calloc(1, sizeof(typeof(**__head)));        \
 		if (!__x)                                                              \
 			die();                                                             \
 		__x->content = (__val);                                                \
 		__x->next = *__head;                                                   \
 		*__head = __x;                                                         \
-	}																		   \
 }
 
 
@@ -84,7 +82,6 @@
 **   @return: nothing
 */
 #define lst_push_sorted(__head, __val, __cmp) {                                \
-	if (1) {                                                   \
 		typeof(**__head) *__lst = *__head;                                     \
 		typeof(**__head) *__next;                                              \
 		typeof(**__head) *__prev = NULL;                                       \
@@ -104,7 +101,6 @@
 			__prev->next->content = __val;                                     \
 			__prev->next->next = __next;                                       \
 		}                                                                      \
-	}                                                                          \
 }
 
 

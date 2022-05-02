@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/30 18:43:49 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 15:05:18 by besellem         ###   ########.fr       */
+/*   Updated: 2021/10/07 21:43:34 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static void	__cut_precision__(t_pft *pft, char *pad, int *padding)
 	size_t			i;
 
 	i = _len - 1;
-	while (pad[i] == '0')
+	while (i >= 0 && pad[i] == '0')
 		pad[i--] = '\0';
 	if (-1 != _prec && _prec < (int)_len)
 		pad[_prec] = '\0';

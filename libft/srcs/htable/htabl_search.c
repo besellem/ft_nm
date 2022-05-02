@@ -1,36 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   libft.h                                            :+:      :+:    :+:   */
+/*   htabl_search.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/13 02:16:30 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/01 20:54:19 by besellem         ###   ########.fr       */
+/*   Created: 2022/05/01 22:17:50 by besellem          #+#    #+#             */
+/*   Updated: 2022/05/01 22:26:46 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef LIBFT_H
-# define LIBFT_H
+#include "htabl.h"
+#include "ft_string.h"
 
-/*
-** -- INCLUDES --
-*/
-# include <unistd.h>
-# include <stdlib.h>
-# include <string.h>
-# include <limits.h>
+void	*htabl_search(const t_htabl *ht, const char *key)
+{
+	const size_t		idx = htabl_hash(key) % ht->_size;
+	const t_htabl_lst	*lst = ht->_root[idx];
 
-# include "ansi_codes.h"
-# include "defs.h"
-# include "ft_ctype.h"
-# include "ft_list.h"
-# include "list_templates.h"
-# include "htabl.h"
-# include "ft_math.h"
-# include "ft_stdint.h"
-# include "ft_stdio.h"
-# include "ft_stdlib.h"
-# include "ft_string.h"
-
-#endif
+	while (lst)
+	{
+		if (lst->content && lst->content->key
+			&& 0 == ft_strcmp(lst->content->key, key))
+			return (lst->content->value);
+		lst = lst->next;
+	}
+	return (NULL);
+}

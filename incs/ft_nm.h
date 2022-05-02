@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:38:46 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/26 21:46:29 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/02 15:01:14 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ extern t_parsing_opts	g_opts;
 #endif
 
 #ifdef DEBUG
-# define LOG ft_printf(B_GREEN"%s:%d:"CLR_COLOR" %s()\n", __FILE__, __LINE__, __func__);
+# define LOG ft_dprintf(2, B_GREEN"%s:%d:"CLR_COLOR" %s()\n", __FILE__, __LINE__, __func__);
 #else
 # define LOG
 #endif

@@ -6,13 +6,14 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/27 16:08:45 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/02 19:30:40 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
+// static
+char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 {
 	const Elf64_Word	_type = shdr[sym.st_shndx].sh_type;
 	const Elf64_Xword	_flags = shdr[sym.st_shndx].sh_flags;
@@ -50,32 +51,54 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	return type;
 }
 
-static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
+// static
+list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
 {
 	const Elf64_Sym		*symtab = file->p + shdr[idx].sh_offset;
+	const char			*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 	list_t				*tab = NULL;
 
-	for (size_t i = 0; i < (shdr[idx].sh_size / shdr[idx].sh_entsize); ++i)
+	ft_printf("size: %zu, %zu\n",
+		shdr[idx].sh_size / sizeof(Elf64_Sym),
+		shdr[idx].sh_size / shdr[idx].sh_entsize);
+	
+	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf64_Sym)); ++i)
 	{
-		char		*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 		t_symbol	sym = {0};
 
-		sym.type = elf64_get_sym_type(shdr, symtab[i]);
-		sym.name = strtab + symtab[i].st_name;
-		sym.offset = symtab[i].st_value;
+		// ft_printf("offset: %#lx\n", shdr[shdr[idx].sh_link].sh_offset);
+		// ft_printf("offset: %#x %u\n", symtab[i].st_shndx, symtab[i].st_shndx);
 		
-		if (!*sym.name)
+		
+		if (symtab[i].st_shndx == SHN_UNDEF) // TODO: check
+			continue;
+
+		// avoid undefined symbols (avoiding segfault by the way)
+		if (symtab[i].st_shndx >= SHN_LORESERVE) // TODO: check
 			continue ;
+		
+		sym.type = elf64_get_sym_type(shdr, symtab[i]);
+		sym.name = (char *)strtab + symtab[i].st_name;
+		sym.offset = symtab[i].st_value;
+
+		// ft_putstr("[");
+		// write(1, strtab, symtab[i].st_name);
+		// ft_putstr("]\n");
+		// ft_printf("[%s]\n", strtab);
+		
+		// if (!sym.name || !*sym.name)
+		// 	continue ;
 
 		lst_push_sorted(&tab, sym, get_sorting_cmp());
 
-		ft_printf("[%s]\n", sym.name);
-		print_Sym(&symtab[i]);
+		// ft_printf("[%s]\n", sym.name);
+		// print_Sym(&symtab[i]);
 	}
 	return tab;
 }
 
-static void	elf64_print_symtab(const t_file *file, list_t *symtab)
+// static
+void	elf64_print_symtab(const t_file *file, list_t *symtab)
 {
 	t_symbol	sym;
 
@@ -99,11 +122,11 @@ static void	elf64_print_symtab(const t_file *file, list_t *symtab)
 
 void	elf64_exec(const t_file *file, bool print_header)
 {
-	__unused const Elf64_Ehdr	*hdr = file->p;
-	__unused const Elf64_Phdr	*phdr = file->p + hdr->e_phoff;
-	__unused Elf64_Shdr			*shdr = file->p + hdr->e_shoff;
-	list_t						*symtab;
-	size_t						symbols_nb = 0;
+	__unused const Elf64_Ehdr		*hdr = file->p;
+	__unused const Elf64_Phdr		*phdr = file->p + hdr->e_phoff;
+	__unused Elf64_Shdr				*shdr = file->p + hdr->e_shoff;
+	__unused size_t					symbols_nb = 0;
+	__unused list_t					*symtab;
 
 	if (print_header)
 		ft_printf("\n%s:\n", file->filename);
@@ -113,13 +136,22 @@ void	elf64_exec(const t_file *file, bool print_header)
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
-		if (SHT_SYMTAB == shdr[i].sh_type)
+		if (SHT_SYMTAB == shdr[i].sh_type)// || SHT_NOBITS == shdr[i].sh_type)
 		{
 			symtab = elf64_get_symtab(file, shdr, i);
 			elf64_print_symtab(file, symtab);
 			lst_clear(&symtab, LST_CLEAR_IGN);
 			++symbols_nb;
 		}
+		// if (SHT_NOBITS == shdr[i].sh_type)
+		// if (SHT_DYNAMIC == shdr[i].sh_type)
+		// {
+		// 	symtab = elf64_get_symtab(file, shdr, i);
+		// 	// elf64_print_symtab(file, symtab);
+		// 	lst_clear(&symtab, LST_CLEAR_IGN);
+		// 	++symbols_nb;
+		// 	print_Shdr(&shdr[i]);
+		// }
 	}
 
 	if (0 == symbols_nb)
@@ -127,4 +159,5 @@ void	elf64_exec(const t_file *file, bool print_header)
 		ft_dprintf(STDERR_FILENO, "%s: %s: no symbols\n",
 			g_prog_name, file->filename);
 	}
+	// ft_printf("sz: %#lx %#lx\n", 0x00048580UL, hdr->e_shoff);
 }

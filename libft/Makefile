@@ -6,7 +6,7 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/09/13 02:01:30 by besellem          #+#    #+#              #
-#    Updated: 2022/04/26 15:04:15 by besellem         ###   ########.fr        #
+#    Updated: 2022/05/02 18:34:57 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ BUILD_DIR	:=	.build
 SRCS_DIR	:=	srcs
 INCS		:=	-I incs
 SUB_DIR		:=	ctype \
+				htable \
 				list \
 				math \
 				stdio \
@@ -43,6 +44,15 @@ SUB_SRCS	:=	ft_isalnum.c \
 				ft_tolower.c \
 				ft_toupper.c
 SRCS		:=	$(addprefix ctype/, $(SUB_SRCS))
+
+# htabl
+SUB_SRCS	:=	htabl_destroy.c \
+				htabl_hash.c \
+				htabl_insert.c \
+				htabl_new.c \
+				htabl_print.c \
+				htabl_search.c
+SRCS		+=	$(addprefix htable/, $(SUB_SRCS))
 
 # list
 SUB_SRCS	:=	ft_lst_at.c \
@@ -207,7 +217,7 @@ OBJS 		:=	$(SRCS:%.c=$(OBJ_DIR)/%.o)
 
 ## Commands
 CC			:=	gcc
-CFLAGS		:=	-Wall -Wextra -Werror -std=c99
+CFLAGS		:=	#-Wall -Wextra -Werror
 LIBC		:=	ar rcs
 RM			:=	rm -f
 

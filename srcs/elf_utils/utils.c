@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:59 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/27 15:15:35 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/02 15:15:54 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,14 +64,17 @@ void	destroy_file(t_file *file)
 
 int		find_elf_class(t_file *file)
 {
-	const Elf32_Ehdr	*hdr = file->p;
+	const Elf64_Ehdr	*hdr = file->p;
 
-	if (ft_memcmp(hdr->e_ident, ELFMAG, SELFMAG))
-		return 1;
+	// if (ft_memcmp(hdr->e_ident, ELFMAG, SELFMAG))
+	// 	return 1;
 	if (ELFCLASSNONE == hdr->e_ident[EI_CLASS])
 		return 1;
 
 	file->class = hdr->e_ident[EI_CLASS]; // may be ELFCLASS32 or ELFCLASS64
+	// ft_printf("[");
+	// write(1, hdr->e_ident, sizeof(hdr->e_ident));
+	// ft_printf("] [%d]\n", hdr->e_type);
 	return 0;
 }
 
