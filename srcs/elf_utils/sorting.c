@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 21:29:05 by besellem          #+#    #+#             */
-/*   Updated: 2022/04/27 16:19:01 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 10:31:30 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,23 @@
 
 int		sort_alpha_asc(t_symbol a, t_symbol b)
 {
-	char	*p1 = a.name;
-	char	*p2 = b.name;
-	char	*s1;
-	char	*s2;
+	char	*s1 = ft_strdup(a.name);
+	char	*s2 = ft_strdup(b.name);
+	char	*p1 = s1;
+	char	*p2 = s2;
 	int		res;
 
-	for ( ; *p1 && '_' == *p1; ++p1);
-	for ( ; *p2 && '_' == *p2; ++p2);
-
-	s1 = ft_strdup(p1);
-	s2 = ft_strdup(p2);
+	ft_strclean(s1, "_");
+	ft_strclean(s2, "_");
 	ft_strlowcase(s1);
 	ft_strlowcase(s2);
 	
 	res = ft_strcmp(s1, s2);
+	if (0 == res)
+		res = ft_strcmp(a.name, b.name);
 
-	free(s1);
-	free(s2);
-
-	// if (0 == res)
-	// 	return ft_strcmp(a.name, b.name);
+	free(p1);
+	free(p2);
 
 	return res;
 }
@@ -46,9 +42,14 @@ int		sort_alpha_desc(t_symbol a, t_symbol b)
 
 int		sort_addr_asc(t_symbol a, t_symbol b)
 {
-	if (a.offset == 0 && b.offset == 0)
+	// if (!ft_strncmp(a.name, "__asan_", 7) && a.offset > 0)
+	// 	ft_printf("[%30s] off[%zu]\n", a.name, a.offset);
+	
+	// if (0 == (a.offset - b.offset) && (a.type == 'U' && b.type == 'U'))
+	// 	return ft_strcmp(a.name, b.name);
+	if (0 == (a.offset - b.offset))
 	{
-		LOG
+		// LOG
 		return sort_alpha_asc(a, b);
 	}
 	return (int)(a.offset - b.offset);

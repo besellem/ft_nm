@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:59 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/02 15:15:54 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 10:34:44 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int		init_file(const char *filename, t_file *file)
 	file->fd = open(filename, O_RDONLY);
 	if (SYSCALL_ERR == file->fd)
 	{
-		LOG
 		ft_dprintf(STDERR_FILENO, "%s: '%s': %s\n",
 			g_prog_name, filename, strerror(errno));
 		return 1;
@@ -31,7 +30,6 @@ int		init_file(const char *filename, t_file *file)
 
 	if (S_ISDIR(file->st.st_mode))
 	{
-		LOG
 		ft_dprintf(STDERR_FILENO, "%s: Warning: '%s' is a directory\n", g_prog_name, filename);
 		return 1;
 	}
@@ -43,7 +41,6 @@ int		init_file(const char *filename, t_file *file)
 	file->p = mmap(NULL, file->st.st_size, PROT_READ, MAP_SHARED, file->fd, 0);
 	if (MAP_FAILED == file->p)
 	{
-		LOG
 		ft_dprintf(STDERR_FILENO, "%s: %s: %s\n", g_prog_name, filename, strerror(errno));
 		return 1;
 	}
@@ -66,8 +63,8 @@ int		find_elf_class(t_file *file)
 {
 	const Elf64_Ehdr	*hdr = file->p;
 
-	// if (ft_memcmp(hdr->e_ident, ELFMAG, SELFMAG))
-	// 	return 1;
+	if (ft_memcmp(hdr->e_ident, ELFMAG, SELFMAG))
+		return 1;
 	if (ELFCLASSNONE == hdr->e_ident[EI_CLASS])
 		return 1;
 

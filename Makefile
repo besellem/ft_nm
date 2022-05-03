@@ -6,14 +6,14 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/26 14:48:05 by besellem          #+#    #+#              #
-#    Updated: 2022/05/02 19:25:35 by besellem         ###   ########.fr        #
+#    Updated: 2022/05/03 10:49:53 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # COMPILATION
 
 CC			:= gcc
-CFLAGS 		:= -Wall -Wextra -Werror -g3 -fsanitize=address #-Wpedantic -O2
+CFLAGS 		:= -Wall -Wextra -Werror -g #-g3 -fsanitize=address #-Wpedantic -O2
 INCS		:= ./incs/ft_nm.h
 IFLAGS 		:= -I./incs -I./libft/incs
 LIBFLAGS 	:= -L./libft -lft

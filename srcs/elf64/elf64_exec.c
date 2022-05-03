@@ -6,19 +6,33 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/02 19:30:40 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 11:04:08 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-// static
+static
 char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 {
-	const Elf64_Word	_type = shdr[sym.st_shndx].sh_type;
-	const Elf64_Xword	_flags = shdr[sym.st_shndx].sh_flags;
 	const unsigned char	_info = sym.st_info;
+	Elf64_Word			_type = 0;
+	Elf64_Xword			_flags = 0;
 	char				type;
+
+	// avoid special section indexes (avoiding segfault by the way)
+	// TODO: to check
+	if (sym.st_shndx != SHN_UNDEF &&
+		sym.st_shndx != SHN_LORESERVE &&
+		sym.st_shndx != SHN_LOPROC &&
+		sym.st_shndx != SHN_HIPROC &&
+		sym.st_shndx != SHN_ABS &&
+		sym.st_shndx != SHN_COMMON &&
+		sym.st_shndx != SHN_HIRESERVE)
+	{
+		_type = shdr[sym.st_shndx].sh_type;
+		_flags = shdr[sym.st_shndx].sh_flags;
+	}
 
 	if (ELF64_ST_BIND(_info) == STB_GNU_UNIQUE)
 		type = 'u';
@@ -51,53 +65,48 @@ char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	return type;
 }
 
-// static
+static
 list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
 {
 	const Elf64_Sym		*symtab = file->p + shdr[idx].sh_offset;
 	const char			*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 	list_t				*tab = NULL;
 
-	ft_printf("size: %zu, %zu\n",
-		shdr[idx].sh_size / sizeof(Elf64_Sym),
-		shdr[idx].sh_size / shdr[idx].sh_entsize);
+	// ft_printf("size: %zu, %zu\n",
+	// 	shdr[idx].sh_size / sizeof(Elf64_Sym),
+	// 	shdr[idx].sh_size / shdr[idx].sh_entsize);
 	
 	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf64_Sym)); ++i)
 	{
 		t_symbol	sym = {0};
 
 		// ft_printf("offset: %#lx\n", shdr[shdr[idx].sh_link].sh_offset);
-		// ft_printf("offset: %#x %u\n", symtab[i].st_shndx, symtab[i].st_shndx);
+		// ft_printf("offset: %#6x %6u\n", symtab[i].st_shndx, symtab[i].st_shndx);
 		
-		
-		if (symtab[i].st_shndx == SHN_UNDEF) // TODO: check
-			continue;
-
-		// avoid undefined symbols (avoiding segfault by the way)
-		if (symtab[i].st_shndx >= SHN_LORESERVE) // TODO: check
+		if (symtab[i].st_shndx == SHN_ABS && !option_set(g_opts.opts, OPT_A_MIN))
 			continue ;
-		
+
 		sym.type = elf64_get_sym_type(shdr, symtab[i]);
 		sym.name = (char *)strtab + symtab[i].st_name;
 		sym.offset = symtab[i].st_value;
-
-		// ft_putstr("[");
-		// write(1, strtab, symtab[i].st_name);
-		// ft_putstr("]\n");
-		// ft_printf("[%s]\n", strtab);
 		
-		// if (!sym.name || !*sym.name)
-		// 	continue ;
+
+		if (ft_islower(sym.type) && sym.type != 'w' && option_set(g_opts.opts, OPT_G_MIN))
+			continue ;
+
+		// empty name
+		if (!sym.name || !*sym.name)
+			continue ;
 
 		lst_push_sorted(&tab, sym, get_sorting_cmp());
-
+		
 		// ft_printf("[%s]\n", sym.name);
 		// print_Sym(&symtab[i]);
 	}
 	return tab;
 }
 
-// static
+static
 void	elf64_print_symtab(const t_file *file, list_t *symtab)
 {
 	t_symbol	sym;
@@ -109,7 +118,7 @@ void	elf64_print_symtab(const t_file *file, list_t *symtab)
 		if (option_set(g_opts.opts, OPT_O_MIN))
 			ft_printf("%s:", file->filename);
 
-		if (0 == sym.offset)
+		if ('U' == sym.type || 0 == sym.offset)
 		{
 			ft_printf("%16.d %c %s\n", 0, sym.type, sym.name);
 		}
