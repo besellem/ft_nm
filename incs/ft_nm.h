@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:38:46 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/02 15:01:14 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 14:32:19 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ typedef struct
 int		init_file(const char *, t_file *);
 void	destroy_file(t_file *);
 int		find_elf_class(t_file *);
+void	elf_display_list(const t_file *, list_t *);
 
 /* utils - sorting */
 int		sort_alpha_asc(t_symbol, t_symbol);

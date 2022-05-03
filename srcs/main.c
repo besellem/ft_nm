@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:40:44 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 10:34:58 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 15:17:16 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ int		ft_nm(const char *filename, bool print_header)
 		return 1;
 	}
 	
-	// ft_printf("class: %d\n", file.class);
-	
 	// if (ELFCLASS32 == file.class)
 	// 	elf32_exec(&file, print_header);
 	// else if (ELFCLASS64 == file.class)
@@ -38,7 +36,6 @@ int		ft_nm(const char *filename, bool print_header)
 	{
 		elf64_exec(&file, print_header);
 	}
-	
 	
 	destroy_file(&file);
 	return 0;

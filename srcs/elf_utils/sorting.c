@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 21:29:05 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 10:31:30 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/03 14:24:33 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,9 @@ int		sort_alpha_asc(t_symbol a, t_symbol b)
 	int		res;
 
 	ft_strclean(s1, "_");
+	ft_strclean(s1, "."); // TODO: to check
 	ft_strclean(s2, "_");
+	ft_strclean(s2, "."); // TODO: to check
 	ft_strlowcase(s1);
 	ft_strlowcase(s2);
 	
