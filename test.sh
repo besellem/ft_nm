@@ -23,4 +23,11 @@ nm      $* > real
 
 diff -y --color mine real
 
+if [ $? -eq 0 ]
+then
+	echo "✅ no diff"
+else
+	echo "❌ diff detected"
+fi
+
 rm -f real mine
