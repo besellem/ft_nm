@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 14:33:55 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 15:14:45 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	else if (_type == SHT_PROGBITS && (_flags == SHF_ALLOC || _flags == (SHF_ALLOC | SHF_MERGE)))
 		type = 'R';
 	else if ((_type == SHT_PROGBITS && _flags == (SHF_ALLOC | SHF_WRITE)) ||
-			 _type == SHT_DYNAMIC ||
+			 _type == SHT_DYNAMIC || _type == SHT_INIT_ARRAY || _type == SHT_FINI_ARRAY ||
 			 (ELF64_ST_BIND(_info) == STB_GLOBAL && _type == STT_OBJECT && sym.st_shndx == SHN_UNDEF))
 		type = 'D';
 	else if (_type == SHT_PROGBITS || _type == SHT_INIT_ARRAY || _type == SHT_FINI_ARRAY)
@@ -58,8 +58,8 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	else
 		type = '?';
 	
-	if (ELF64_ST_BIND(_info) == STB_LOCAL && type != '?')
-		type += 32;
+	if (ELF64_ST_BIND(_info) == STB_LOCAL )
+		type = ft_tolower(type);
 	
 	return type;
 }
@@ -133,16 +133,13 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 	return tab;
 }
 
-void	elf64_exec(const t_file *file, bool print_header)
+void	elf64_exec(const t_file *file)
 {
 	const Elf64_Ehdr		*hdr = file->p;
 	__unused const Elf64_Phdr	*phdr = file->p + hdr->e_phoff;
 	Elf64_Shdr				*shdr = file->p + hdr->e_shoff;
 	size_t					symbols_nb = 0;
 	list_t					*symtab;
-
-	if (print_header)
-		ft_printf("\n%s:\n", file->filename);
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{

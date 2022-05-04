@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:59 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 15:50:09 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 15:08:59 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,11 @@ int		init_file(const char *filename, t_file *file)
 		return 1;
 	}
 
-	// file too small to be valid
-	if (file->st.st_size < (long)sizeof(Elf32_Ehdr))
+	// // file too small to be valid
+	// if (file->st.st_size < (long)sizeof(Elf32_Ehdr))
+	// 	return 1;
+	
+	if (file->st.st_size <= 0)
 		return 1;
 
 	file->p = mmap(NULL, file->st.st_size, PROT_READ, MAP_SHARED, file->fd, 0);
@@ -62,12 +65,29 @@ int		find_elf_class(t_file *file)
 {
 	const Elf64_Ehdr	*hdr = file->p;
 
+	file->class = hdr->e_ident[EI_CLASS]; // may be ELFCLASS32 or ELFCLASS64
+	return 0;
+}
+
+int		elf_check_integrity(const t_file *file)
+{
+	const Elf64_Ehdr	*hdr = file->p;
+	const Elf64_Shdr	*shdr = file->p + hdr->e_shoff;
+
+	// file too small to be valid
+	if (file->st.st_size < (long)sizeof(*hdr))
+		return 1;
+
 	if (ft_memcmp(hdr->e_ident, ELFMAG, SELFMAG))
 		return 1;
+	
 	if (ELFCLASSNONE == hdr->e_ident[EI_CLASS])
 		return 1;
 
-	file->class = hdr->e_ident[EI_CLASS]; // may be ELFCLASS32 or ELFCLASS64
+	// file too small for supposed data
+	if ((hdr->e_shnum * sizeof(*shdr)) > (size_t)file->st.st_size)
+		return 1;
+
 	return 0;
 }
 
@@ -82,7 +102,10 @@ void	elf_display_list(const t_file *file, list_t *symtab)
 		if (option_set(g_opts.opts, OPT_O_MIN))
 			ft_printf("%s:", file->filename);
 
-		if (sym.offset > 0 || 't' == ft_tolower(sym.type))// || 'U' == sym.type || 0 == sym.offset)
+		if (sym.offset > 0 ||
+			't' == ft_tolower(sym.type) ||
+			'a' == ft_tolower(sym.type) ||
+			'b' == ft_tolower(sym.type))//|| 'U' == sym.type || 0 == sym.offset)
 		{
 			ft_printf("%016lx %c %s\n", sym.offset, sym.type, sym.name);
 		}

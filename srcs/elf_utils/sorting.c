@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 21:29:05 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 14:24:33 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 15:17:56 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,8 @@ int		sort_alpha_asc(t_symbol a, t_symbol b)
 	char	*p2 = s2;
 	int		res;
 
-	ft_strclean(s1, "_");
-	ft_strclean(s1, "."); // TODO: to check
-	ft_strclean(s2, "_");
-	ft_strclean(s2, "."); // TODO: to check
+	ft_strclean(s1, "_."); // TODO: check if '.' is correct
+	ft_strclean(s2, "_."); // TODO: check if '.' is correct
 	ft_strlowcase(s1);
 	ft_strlowcase(s2);
 	
@@ -44,11 +42,10 @@ int		sort_alpha_desc(t_symbol a, t_symbol b)
 
 int		sort_addr_asc(t_symbol a, t_symbol b)
 {
-	// if (!ft_strncmp(a.name, "__asan_", 7) && a.offset > 0)
-	// 	ft_printf("[%30s] off[%zu]\n", a.name, a.offset);
+	// -n option
+	if ('t' == ft_tolower(a.type) && 'u' == ft_tolower(b.type))
+		return 1;
 	
-	// if (0 == (a.offset - b.offset) && (a.type == 'U' && b.type == 'U'))
-	// 	return ft_strcmp(a.name, b.name);
 	if (0 == (a.offset - b.offset))
 	{
 		// LOG

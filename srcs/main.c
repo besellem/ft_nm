@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:40:44 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/03 15:17:16 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 15:14:39 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,28 +22,38 @@ int		ft_nm(const char *filename, bool print_header)
 	if (init_file(filename, &file))
 		return 1;
 	
-	if (find_elf_class(&file))
+	
+	if (elf_check_integrity(&file))
 	{
-		ft_printf("%s: %s: file format not recognized\n", g_prog_name, filename);
+		ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
+			g_prog_name, filename);
 		return 1;
 	}
+
 	
-	// if (ELFCLASS32 == file.class)
-	// 	elf32_exec(&file, print_header);
-	// else if (ELFCLASS64 == file.class)
-	// 	elf64_exec(&file, print_header);
-	if (ELFCLASS64 == file.class)
+	if (find_elf_class(&file))
+		return 1;
+	
+	if (print_header)
+		ft_printf("\n%s:\n", file.filename);
+	
+	if (ELFCLASS32 == file.class)
 	{
-		elf64_exec(&file, print_header);
+		LOG
+		// elf32_exec(&file);
+	}
+	else if (ELFCLASS64 == file.class)
+	{
+		elf64_exec(&file);
 	}
 	
-	destroy_file(&file);
 	return 0;
 }
 
 int		main(int ac, char **av)
 {
 	bool	errors = false;
+	bool	print_header = false;
 
 	g_prog_name = ft_basename(av[0]);
 
@@ -58,7 +68,7 @@ int		main(int ac, char **av)
 		return 1;
 	}
 
-
+	
 	/* if there's no file provided, try ft_nm on ./a.out */
 	if (g_opts.end_pos == ac)
 	{
@@ -66,9 +76,10 @@ int		main(int ac, char **av)
 	}
 	else
 	{
+		print_header = (ac - g_opts.end_pos > 1) && !option_set(g_opts.opts, OPT_O_MIN);
 		for (int i = g_opts.end_pos; i < ac; ++i)
 		{
-			errors |= ft_nm(av[i], (ac - g_opts.end_pos > 1));
+			errors |= ft_nm(av[i], print_header);
 		}
 	}
 	
