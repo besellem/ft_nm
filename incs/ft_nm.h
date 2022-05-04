@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:38:46 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 17:35:53 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:29:05 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,24 +95,18 @@ typedef struct
 /* utils */
 int		init_file(const char *, t_file *);
 void	destroy_file(t_file *);
-void	elf_display_list(const t_file *, list_t *);
 
 int		elf_integrity_check(const t_file *);
+void	elf_display_list(const t_file *, list_t *);
 
-/* utils - sorting */
 int		sort_alpha_asc(t_symbol, t_symbol);
 int		sort_alpha_desc(t_symbol, t_symbol);
 int		sort_addr_asc(t_symbol, t_symbol);
 int		sort_addr_desc(t_symbol, t_symbol);
 
 
-// TODO: to remove
-	void	print_Ehdr(const Elf64_Ehdr *);
-	void	print_Phdr(const Elf64_Phdr *);
-	void	print_Shdr(const Elf64_Shdr *);
-	void	print_Sym(const Elf64_Sym *);
-// end to remove
-
+/* elf32 */
+void	elf32_exec(const t_file *);
 
 /* elf64 */
 void	elf64_exec(const t_file *);

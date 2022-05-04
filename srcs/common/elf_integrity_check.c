@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:28:45 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 17:29:47 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:21:45 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ static int	_elf32_integrity_check(const t_file *file)
 		return 1;
 
 	if (ELFCLASSNONE == hdr->e_ident[EI_CLASS])
+		return 1;
+
+	if ((size_t)file->st.st_size < hdr->e_phoff)
+		return 1;
+
+	if ((size_t)file->st.st_size < hdr->e_shoff)
 		return 1;
 
 	// file too small for supposed data
@@ -47,6 +53,12 @@ static int	_elf64_integrity_check(const t_file *file)
 		return 1;
 
 	if (ELFCLASSNONE == hdr->e_ident[EI_CLASS])
+		return 1;
+
+	if ((size_t)file->st.st_size < hdr->e_phoff)
+		return 1;
+
+	if ((size_t)file->st.st_size < hdr->e_shoff)
 		return 1;
 
 	// file too small for supposed data

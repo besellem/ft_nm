@@ -1,22 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   elf64_exec.c                                       :+:      :+:    :+:   */
+/*   elf32_exec.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 22:23:52 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:26:20 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_nm.h"
 
-static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
+static char		elf32_get_sym_type(const Elf32_Shdr *shdr, const Elf32_Sym sym)
 {
 	const unsigned char	_info = sym.st_info;
-	Elf64_Word			_type = 0;
-	Elf64_Xword			_flags = 0;
+	Elf32_Word			_type = 0;
+	Elf32_Word			_flags = 0;
 	char				type;
 
 	// avoid special section indexes (avoiding segfault by the way)
@@ -33,11 +33,11 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 		_flags = shdr[sym.st_shndx].sh_flags;
 	}
 
-	if (ELF64_ST_BIND(_info) == STB_GNU_UNIQUE)
+	if (ELF32_ST_BIND(_info) == STB_GNU_UNIQUE)
 		type = 'u';
-	else if (ELF64_ST_BIND(_info) == STB_WEAK)
+	else if (ELF32_ST_BIND(_info) == STB_WEAK)
 		type = (SHN_UNDEF == sym.st_shndx) ? 'w' : 'W';
-	else if (ELF64_ST_BIND(_info) == STB_WEAK && ELF64_ST_TYPE(_info) == STT_OBJECT)
+	else if (ELF32_ST_BIND(_info) == STB_WEAK && ELF32_ST_TYPE(_info) == STT_OBJECT)
 		type = (SHN_UNDEF == sym.st_shndx) ? 'v' : 'V';
 	else if (SHN_UNDEF == sym.st_shndx)
 		type = 'U';
@@ -51,22 +51,22 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 		type = 'R';
 	else if ((SHT_PROGBITS == _type && _flags == (SHF_ALLOC | SHF_WRITE)) ||
 			 SHT_DYNAMIC == _type || SHT_INIT_ARRAY == _type || SHT_FINI_ARRAY == _type ||
-			 (ELF64_ST_BIND(_info) == STB_GLOBAL && STT_OBJECT == _type && SHN_UNDEF == sym.st_shndx))
+			 (ELF32_ST_BIND(_info) == STB_GLOBAL && STT_OBJECT == _type && SHN_UNDEF == sym.st_shndx))
 		type = 'D';
 	else if (SHT_PROGBITS == _type || SHT_INIT_ARRAY == _type || SHT_FINI_ARRAY == _type)
 		type = 'T';
 	else
 		type = '?';
 	
-	if (ELF64_ST_BIND(_info) == STB_LOCAL)
+	if (ELF32_ST_BIND(_info) == STB_LOCAL)
 		type = ft_tolower(type);
 	
 	return type;
 }
 
-static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
+static list_t	*elf32_get_symtab(const t_file *file, const Elf32_Shdr *shdr, size_t idx)
 {
-	const Elf64_Sym		*symtab = file->p + shdr[idx].sh_offset;
+	const Elf32_Sym		*symtab = file->p + shdr[idx].sh_offset;
 	const char			*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 	list_t				*tab = NULL;
 
@@ -77,7 +77,7 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 		return NULL;
 	}
 
-	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf64_Sym)); ++i)
+	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf32_Sym)); ++i)
 	{
 		t_symbol	sym = {0};
 
@@ -85,12 +85,12 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 		if (SHN_ABS == symtab[i].st_shndx && !option_set(g_opts.opts, OPT_A_MIN))
 			continue ;
 
-		sym.type = elf64_get_sym_type(shdr, symtab[i]);
+		sym.type = elf32_get_sym_type(shdr, symtab[i]);
 		sym.name = (char *)strtab + symtab[i].st_name;
 		sym.offset = symtab[i].st_value;
 
 		// special error case
-		if (STT_NOTYPE == ELF64_ST_TYPE(symtab[i].st_info) && '$' == *sym.name) // TODO: check
+		if (STT_NOTYPE == ELF32_ST_TYPE(symtab[i].st_info) && '$' == *sym.name) // TODO: check
 			continue ;
 
 		// empty name
@@ -118,10 +118,10 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 	return tab;
 }
 
-void	elf64_exec(const t_file *file)
+void	elf32_exec(const t_file *file)
 {
-	const Elf64_Ehdr	*hdr = file->p;
-	Elf64_Shdr			*shdr = file->p + hdr->e_shoff;
+	const Elf32_Ehdr	*hdr = file->p;
+	Elf32_Shdr			*shdr = file->p + hdr->e_shoff;
 	size_t				symbols_nb = 0;
 	list_t				*symtab;
 
@@ -129,7 +129,7 @@ void	elf64_exec(const t_file *file)
 	{
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
-			symtab = elf64_get_symtab(file, shdr, i);
+			symtab = elf32_get_symtab(file, shdr, i);
 			if (!symtab)
 			{
 				ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",

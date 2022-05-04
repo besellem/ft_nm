@@ -6,7 +6,7 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/26 14:48:05 by besellem          #+#    #+#              #
-#    Updated: 2022/05/04 17:44:45 by besellem         ###   ########.fr        #
+#    Updated: 2022/05/04 22:25:16 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,6 +24,7 @@ BUILD		:= .build
 LIB_DIR		:= libft
 SRC_DIR		:= srcs
 SUB_DIR		:= common \
+			   elf32 \
 			   elf64
 OBJ_DIR 	:= $(BUILD)/obj
 DIRS		:= $(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_DIR))
@@ -38,6 +39,8 @@ SUB_SRC	:= elf_display.c \
 		   utils.c \
 		   sorting.c
 SRC		+= $(addprefix common/, $(SUB_SRC))
+SUB_SRC	:= elf32_exec.c
+SRC		+= $(addprefix elf32/, $(SUB_SRC))
 SUB_SRC	:= elf64_exec.c
 SRC		+= $(addprefix elf64/, $(SUB_SRC))
 
