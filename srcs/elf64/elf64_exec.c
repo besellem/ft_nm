@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 22:46:04 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:52:35 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	char				type;
 
 	// avoid special section indexes (avoiding segfault by the way)
-	// TODO: to check
 	if (sym.st_shndx != SHN_UNDEF &&
 		sym.st_shndx != SHN_LORESERVE &&
 		sym.st_shndx != SHN_LOPROC &&
