@@ -6,7 +6,7 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/26 14:48:05 by besellem          #+#    #+#              #
-#    Updated: 2022/05/04 15:11:03 by besellem         ###   ########.fr        #
+#    Updated: 2022/05/04 17:44:45 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ LIBFLAGS 	:= -L./libft -lft
 BUILD		:= .build
 LIB_DIR		:= libft
 SRC_DIR		:= srcs
-SUB_DIR		:= elf_utils \
+SUB_DIR		:= common \
 			   elf64
 OBJ_DIR 	:= $(BUILD)/obj
 DIRS		:= $(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_DIR))
@@ -32,9 +32,12 @@ DIRS		:= $(OBJ_DIR) $(addprefix $(OBJ_DIR)/, $(SUB_DIR))
 
 NAME	:= ft_nm
 SRC		:= main.c
-SUB_SRC	:= utils.c \
+SUB_SRC	:= elf_display.c \
+		   elf_file.c \
+		   elf_integrity_check.c \
+		   utils.c \
 		   sorting.c
-SRC		+= $(addprefix elf_utils/, $(SUB_SRC))
+SRC		+= $(addprefix common/, $(SUB_SRC))
 SUB_SRC	:= elf64_exec.c
 SRC		+= $(addprefix elf64/, $(SUB_SRC))
 

@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 21:29:05 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 15:17:56 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 17:43:30 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int		sort_alpha_asc(t_symbol a, t_symbol b)
 {
 	char	*s1 = ft_strdup(a.name);
 	char	*s2 = ft_strdup(b.name);
-	char	*p1 = s1;
-	char	*p2 = s2;
+	void	*p1 = s1;
+	void	*p2 = s2;
 	int		res;
 
 	ft_strclean(s1, "_."); // TODO: check if '.' is correct
@@ -45,12 +45,10 @@ int		sort_addr_asc(t_symbol a, t_symbol b)
 	// -n option
 	if ('t' == ft_tolower(a.type) && 'u' == ft_tolower(b.type))
 		return 1;
-	
+
 	if (0 == (a.offset - b.offset))
-	{
-		// LOG
 		return sort_alpha_asc(a, b);
-	}
+
 	return (int)(a.offset - b.offset);
 }
 

@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:40:44 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 15:14:39 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 17:28:07 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,21 @@
 char				*g_prog_name;
 t_parsing_opts		g_opts;
 
-int		ft_nm(const char *filename, bool print_header)
+static int	ft_nm(const char *filename, bool print_header)
 {
 	t_file	file = {0};
 
 	if (init_file(filename, &file))
 		return 1;
 	
-	
-	if (elf_check_integrity(&file))
+	if (elf_integrity_check(&file))
 	{
 		ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
 			g_prog_name, filename);
 		return 1;
 	}
 
-	
-	if (find_elf_class(&file))
-		return 1;
-	
+
 	if (print_header)
 		ft_printf("\n%s:\n", file.filename);
 	
@@ -46,6 +42,8 @@ int		ft_nm(const char *filename, bool print_header)
 	{
 		elf64_exec(&file);
 	}
+
+	destroy_file(&file);
 	
 	return 0;
 }
@@ -53,7 +51,6 @@ int		ft_nm(const char *filename, bool print_header)
 int		main(int ac, char **av)
 {
 	bool	errors = false;
-	bool	print_header = false;
 
 	g_prog_name = ft_basename(av[0]);
 
@@ -76,7 +73,8 @@ int		main(int ac, char **av)
 	}
 	else
 	{
-		print_header = (ac - g_opts.end_pos > 1) && !option_set(g_opts.opts, OPT_O_MIN);
+		bool print_header = (ac - g_opts.end_pos > 1) && !option_set(g_opts.opts, OPT_O_MIN);
+		
 		for (int i = g_opts.end_pos; i < ac; ++i)
 		{
 			errors |= ft_nm(av[i], print_header);

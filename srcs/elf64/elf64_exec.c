@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 15:14:45 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 17:42:00 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,16 +135,16 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 
 void	elf64_exec(const t_file *file)
 {
-	const Elf64_Ehdr		*hdr = file->p;
-	__unused const Elf64_Phdr	*phdr = file->p + hdr->e_phoff;
-	Elf64_Shdr				*shdr = file->p + hdr->e_shoff;
-	size_t					symbols_nb = 0;
-	list_t					*symtab;
+	const Elf64_Ehdr	*hdr = file->p;
+	Elf64_Shdr			*shdr = file->p + hdr->e_shoff;
+	size_t				symbols_nb = 0;
+	list_t				*symtab;
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
-		// ft_printf("type: [%4u] [%#4x]\n", shdr[i].sh_type, shdr[i].sh_type);
-		
+		// if (SHT_NULL == shdr[i].sh_type)
+		// 	continue ;
+
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
 			symtab = elf64_get_symtab(file, shdr, i);
