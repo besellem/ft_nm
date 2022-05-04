@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 22:23:52 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:46:04 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,8 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 	if ((size_t)file->st.st_size < shdr[idx].sh_offset ||
 		(size_t)file->st.st_size < shdr[shdr[idx].sh_link].sh_offset)
 	{
+		ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
+					g_prog_name, file->filename);
 		return NULL;
 	}
 
@@ -129,16 +131,12 @@ void	elf64_exec(const t_file *file)
 	{
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
+			++symbols_nb;
 			symtab = elf64_get_symtab(file, shdr, i);
 			if (!symtab)
-			{
-				ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
-					g_prog_name, file->filename);
-				return ;
-			}
+				continue ;
 			elf_display_list(file, symtab);
 			lst_clear(&symtab, LST_CLEAR_IGN);
-			++symbols_nb;
 		}
 	}
 

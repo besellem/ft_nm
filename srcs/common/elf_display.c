@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/04 17:44:52 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 17:45:32 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/04 22:41:01 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@ void	elf_display_list(const t_file *file, list_t *symtab)
 		if (sym.offset > 0 ||
 			't' == ft_tolower(sym.type) ||
 			'a' == ft_tolower(sym.type) ||
+			'D' == sym.type ||
+			'W' == sym.type ||
+			'R' == sym.type ||
 			'b' == ft_tolower(sym.type))//|| 'U' == sym.type || 0 == sym.offset)
 		{
 			ft_printf("%016lx %c %s\n", sym.offset, sym.type, sym.name);
