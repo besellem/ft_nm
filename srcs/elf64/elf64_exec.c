@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/05 00:37:36 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/05 15:11:54 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ static int	elf64_get_symtab(list_t **lst, const t_file *file, const Elf64_Shdr *
 		sym.offset = symtab[i].st_value;
 
 		// special error case
-		if (STT_NOTYPE == ELF64_ST_TYPE(symtab[i].st_info) && '$' == *sym.name) // TODO: check
+		if (STT_NOTYPE == ELF64_ST_TYPE(symtab[i].st_info) && '$' == *sym.name)
 			continue ;
 
 		// empty name
@@ -125,29 +125,6 @@ void	elf64_exec(const t_file *file)
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
-		// if (SHT_NULL != shdr[i].sh_type && SHT_SYMTAB != shdr[i].sh_type &&
-		// 	option_set(g_opts.opts, OPT_A_MIN))
-		// {
-			
-		// 	elf64_get_symtab(&lst, file, shdr, hdr->e_shstrndx);
-		// 	// char		*sh_strtab_p = file->p + shdr[hdr->e_shstrndx].sh_offset;
-		// 	// t_symbol	sym = {0};
-			
-		// 	// sym.type = '?';
-		// 	// sym.name = file->p + shdr[hdr->e_shstrndx].sh_offset + shdr[i].sh_name;
-		// 	// sym.offset = 0;
-			
-		// 	// // -p option
-		// 	// if (option_set(g_opts.opts, OPT_P_MIN))
-		// 	// {
-		// 	// 	lst_push_back(&lst, sym);
-		// 	// }
-		// 	// else
-		// 	// {
-		// 	// 	lst_push_sorted(&lst, sym, get_sorting_cmp());
-		// 	// }
-		// }
-		
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
 			++symbols_nb;

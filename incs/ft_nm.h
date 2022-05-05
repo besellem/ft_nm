@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 14:38:46 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 23:03:37 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/05 15:11:13 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,13 +103,6 @@ int		sort_alpha_asc(t_symbol, t_symbol);
 int		sort_alpha_desc(t_symbol, t_symbol);
 int		sort_addr_asc(t_symbol, t_symbol);
 int		sort_addr_desc(t_symbol, t_symbol);
-
-// TODO: to remove
-void	print_Ehdr(const Elf64_Ehdr *);
-void	print_Phdr(const Elf64_Phdr *);
-void	print_Shdr(const Elf64_Shdr *);
-void	print_Sym(const Elf64_Sym *);
-// end to remove
 
 
 /* elf32 */

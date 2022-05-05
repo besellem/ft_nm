@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/05 00:37:17 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/05 15:11:54 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ static int	elf32_get_symtab(list_t **lst, const t_file *file, const Elf32_Shdr *
 		sym.offset = symtab[i].st_value;
 
 		// special error case
-		if (STT_NOTYPE == ELF32_ST_TYPE(symtab[i].st_info) && '$' == *sym.name) // TODO: check
+		if (STT_NOTYPE == ELF32_ST_TYPE(symtab[i].st_info) && '$' == *sym.name)
 			continue ;
 
 		// empty name

@@ -6,14 +6,14 @@
 #    By: besellem <besellem@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/04/26 14:48:05 by besellem          #+#    #+#              #
-#    Updated: 2022/05/04 23:38:05 by besellem         ###   ########.fr        #
+#    Updated: 2022/05/05 15:12:08 by besellem         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # COMPILATION
 
 CC			:= gcc
-CFLAGS 		:= -Wall -Wextra -Werror -g3# -fsanitize=address #-Wpedantic -O2
+CFLAGS 		:= -Wall -Wextra -Werror #-g3# -fsanitize=address #-Wpedantic -O2
 INCS		:= ./incs/ft_nm.h
 IFLAGS 		:= -I./incs -I./libft/incs
 LIBFLAGS 	:= -L./libft -lft
@@ -36,7 +36,6 @@ SRC		:= main.c
 SUB_SRC	:= elf_display.c \
 		   elf_file.c \
 		   elf_integrity_check.c \
-		   utils.c \
 		   sorting.c
 SRC		+= $(addprefix common/, $(SUB_SRC))
 SUB_SRC	:= elf32_exec.c
