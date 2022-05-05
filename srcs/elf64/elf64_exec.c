@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 22:52:35 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/05 00:37:36 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,19 +63,16 @@ static char		elf64_get_sym_type(const Elf64_Shdr *shdr, const Elf64_Sym sym)
 	return type;
 }
 
-static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size_t idx)
+static int	elf64_get_symtab(list_t **lst, const t_file *file, const Elf64_Shdr *shdr, size_t idx)
 {
-	const Elf64_Sym		*symtab = file->p + shdr[idx].sh_offset;
-	const char			*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
-	list_t				*tab = NULL;
+	const Elf64_Sym	*symtab = file->p + shdr[idx].sh_offset;
+	const char		*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 
 	// file truncated
 	if ((size_t)file->st.st_size < shdr[idx].sh_offset ||
 		(size_t)file->st.st_size < shdr[shdr[idx].sh_link].sh_offset)
 	{
-		ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
-					g_prog_name, file->filename);
-		return NULL;
+		return 1;
 	}
 
 	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf64_Sym)); ++i)
@@ -109,14 +106,14 @@ static list_t	*elf64_get_symtab(const t_file *file, const Elf64_Shdr *shdr, size
 		// -p option
 		if (option_set(g_opts.opts, OPT_P_MIN))
 		{
-			lst_push_back(&tab, sym);
+			lst_push_back(lst, sym);
 		}
 		else
 		{
-			lst_push_sorted(&tab, sym, get_sorting_cmp());
+			lst_push_sorted(lst, sym, get_sorting_cmp());
 		}
 	}
-	return tab;
+	return 0;
 }
 
 void	elf64_exec(const t_file *file)
@@ -124,20 +121,46 @@ void	elf64_exec(const t_file *file)
 	const Elf64_Ehdr	*hdr = file->p;
 	Elf64_Shdr			*shdr = file->p + hdr->e_shoff;
 	size_t				symbols_nb = 0;
-	list_t				*symtab;
+	list_t				*lst = NULL;
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
+		// if (SHT_NULL != shdr[i].sh_type && SHT_SYMTAB != shdr[i].sh_type &&
+		// 	option_set(g_opts.opts, OPT_A_MIN))
+		// {
+			
+		// 	elf64_get_symtab(&lst, file, shdr, hdr->e_shstrndx);
+		// 	// char		*sh_strtab_p = file->p + shdr[hdr->e_shstrndx].sh_offset;
+		// 	// t_symbol	sym = {0};
+			
+		// 	// sym.type = '?';
+		// 	// sym.name = file->p + shdr[hdr->e_shstrndx].sh_offset + shdr[i].sh_name;
+		// 	// sym.offset = 0;
+			
+		// 	// // -p option
+		// 	// if (option_set(g_opts.opts, OPT_P_MIN))
+		// 	// {
+		// 	// 	lst_push_back(&lst, sym);
+		// 	// }
+		// 	// else
+		// 	// {
+		// 	// 	lst_push_sorted(&lst, sym, get_sorting_cmp());
+		// 	// }
+		// }
+		
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
 			++symbols_nb;
-			symtab = elf64_get_symtab(file, shdr, i);
-			if (!symtab)
-				continue ;
-			elf_display_list(file, symtab);
-			lst_clear(&symtab, LST_CLEAR_IGN);
+			if (elf64_get_symtab(&lst, file, shdr, i))
+			{
+				ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
+							g_prog_name, file->filename);
+			}
 		}
 	}
+
+	elf_display_list(file, lst);
+	lst_clear(&lst, LST_CLEAR_IGN);
 
 	if (0 == symbols_nb && hdr->e_shnum > 0)
 	{

@@ -6,7 +6,7 @@
 /*   By: besellem <besellem@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/26 20:22:06 by besellem          #+#    #+#             */
-/*   Updated: 2022/05/04 22:52:28 by besellem         ###   ########.fr       */
+/*   Updated: 2022/05/05 00:37:17 by besellem         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,19 +63,16 @@ static char		elf32_get_sym_type(const Elf32_Shdr *shdr, const Elf32_Sym sym)
 	return type;
 }
 
-static list_t	*elf32_get_symtab(const t_file *file, const Elf32_Shdr *shdr, size_t idx)
+static int	elf32_get_symtab(list_t **lst, const t_file *file, const Elf32_Shdr *shdr, size_t idx)
 {
-	const Elf32_Sym		*symtab = file->p + shdr[idx].sh_offset;
-	const char			*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
-	list_t				*tab = NULL;
+	const Elf32_Sym	*symtab = file->p + shdr[idx].sh_offset;
+	const char		*strtab = file->p + shdr[shdr[idx].sh_link].sh_offset;
 
 	// file truncated
 	if ((size_t)file->st.st_size < shdr[idx].sh_offset ||
 		(size_t)file->st.st_size < shdr[shdr[idx].sh_link].sh_offset)
 	{
-		ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
-					g_prog_name, file->filename);
-		return NULL;
+		return 1;
 	}
 
 	for (size_t i = 0; i < (shdr[idx].sh_size / sizeof(Elf32_Sym)); ++i)
@@ -109,14 +106,14 @@ static list_t	*elf32_get_symtab(const t_file *file, const Elf32_Shdr *shdr, size
 		// -p option
 		if (option_set(g_opts.opts, OPT_P_MIN))
 		{
-			lst_push_back(&tab, sym);
+			lst_push_back(lst, sym);
 		}
 		else
 		{
-			lst_push_sorted(&tab, sym, get_sorting_cmp());
+			lst_push_sorted(lst, sym, get_sorting_cmp());
 		}
 	}
-	return tab;
+	return 0;
 }
 
 void	elf32_exec(const t_file *file)
@@ -124,20 +121,23 @@ void	elf32_exec(const t_file *file)
 	const Elf32_Ehdr	*hdr = file->p;
 	Elf32_Shdr			*shdr = file->p + hdr->e_shoff;
 	size_t				symbols_nb = 0;
-	list_t				*symtab;
+	list_t				*lst = NULL;
 
 	for (size_t i = 0; i < hdr->e_shnum; ++i)
 	{
 		if (SHT_SYMTAB == shdr[i].sh_type)
 		{
 			++symbols_nb;
-			symtab = elf32_get_symtab(file, shdr, i);
-			if (!symtab)
-				continue ;
-			elf_display_list(file, symtab);
-			lst_clear(&symtab, LST_CLEAR_IGN);
+			if (elf32_get_symtab(&lst, file, shdr, i))
+			{
+				ft_dprintf(STDERR_FILENO, "%s: %s: file format not recognized\n",
+							g_prog_name, file->filename);
+			}
 		}
 	}
+
+	elf_display_list(file, lst);
+	lst_clear(&lst, LST_CLEAR_IGN);
 
 	if (0 == symbols_nb && hdr->e_shnum > 0)
 	{
